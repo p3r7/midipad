@@ -74,13 +74,16 @@ mod.hook.register("script_pre_init", "midipad-script-pre-init", function ()
                     local script_init = init
                     init = function ()
                       script_init()
-                      -- TODO: test not empty callback to not override script beahviour
-                      gamepad.astick = function(sensor_axis, val, half_reso)
+                      local script_gamepad_analog = gamepad.analog
+                      gamepad.analog = function(sensor_axis, val, half_reso)
                         if val == nil or half_reso == nil then
                           -- FIXME: why does this even happen?
                           return
                         end
                         local msg = gamepad_analog_event_2_cc(sensor_axis, val, half_reso)
+                        if script_gamepad_analog then
+                          script_gamepad_analog(sensor_axis, val, half_reso)
+                        end
                       end
                     end
 end)
